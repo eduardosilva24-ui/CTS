@@ -55,14 +55,20 @@ class BetGameManipulator {
 
         // FASE 3: CRÍTICA (acima de 30 apostas)
         else {
-            if (this.coins >= 70) {
-                return 0.10 + Math.random() * 0.10; // 10-20%
+            // Colapso mais consistente: reduz a chance real de vitória
+            // especialmente quando o saldo está alto (perto de "sacar" no imaginário).
+            // Continua com variação (recompensa intermitente), mas sem permitir recuperação.
+            if (this.coins >= 85) {
+                return 0.03 + Math.random() * 0.05; // 3-8%
+            } else if (this.coins >= 70) {
+                return 0.07 + Math.random() * 0.07; // 7-14%
             } else if (this.coins >= 50) {
-                return 0.20 + Math.random() * 0.10; // 20-30%
+                return 0.12 + Math.random() * 0.08; // 12-20%
             } else {
-                return 0.25 + Math.random() * 0.10; // 25-35%
+                return 0.16 + Math.random() * 0.10; // 16-26%
             }
         }
+
     }
 
     // Calcular valor ganho

@@ -28,9 +28,129 @@ window.addEventListener('DOMContentLoaded', () => {
 function startGame() {
     // Reinicializar jogo
     gameInstance = new BetGameManipulator();
+
+    stopAutoPlay();
+
+    gameInProgress = false;
     updateUI();
     showMessage("Bem-vindo! Você começa com 10 moedas. Você precisa atingir 100 moedas para sacar!", "welcome");
 }
+
+// ========== AUTO-PLAY (dinâmica crítica 3–5 min) ==========
+let autoPlayTimer = null;
+let autoPlayRunning = false;
+let autoPlayStartedAt = 0;
+let autoPlayEndsAt = 0;
+
+function startAutoPlay() {
+    if (autoPlayRunning) return;
+    if (!gameInstance || gameInstance.gameState !== 'playing') return;
+
+    autoPlayRunning = true;
+    autoPlayStartedAt = Date.now();
+
+    // Meta de duração 3–5 min (rand para variar sessões)
+    const durationMs = (180 + Math.floor(Math.random() * 121)) * 1000; // 180–300s
+    autoPlayEndsAt = autoPlayStartedAt + durationMs;
+
+    // Mensagem inicial (otimista)
+    showMessage("🎯 Dinâmica iniciada. Continue: o sistema está lendo seu ritmo...", 'win');
+    setAutoPlayUIState(true);
+
+    const tick = () => {
+        // Para se terminou ou estourou tempo
+        if (!autoPlayRunning) return;
+        if (gameInstance.gameState !== 'playing') {
+            stopAutoPlay();
+            setTimeout(() => showFinalDashboard(), 600);
+            return;
+        }
+        if (Date.now() >= autoPlayEndsAt) {
+            stopAutoPlay();
+            setTimeout(() => {
+                // Encerrar “por tempo” como condição didática.
+                // Mantemos as métricas do jogo até aqui.
+                gameInstance.gameState = 'lost';
+                showFinalDashboard();
+            }, 600);
+            return;
+        }
+
+        // Selecionar aposta (sempre dentro do saldo)
+        const betAmount = Math.min(parseInt(document.getElementById('bet-amount').value || 1), Math.max(1, gameInstance.coins));
+
+        // Evitar sobreposição visual
+        if (gameInProgress) return;
+        gameInProgress = true;
+
+        const result = gameInstance.placeBet(betAmount);
+        displayBetResult(result);
+        updateUI();
+                    if (result.message) showMessage(result.message, result.is_win ? 'win' : 'loss');
+
+        // Marcação didática: destaca fase e reduz percepção de “travamento”
+        if (typeof gameInstance.manipulationPhase === 'string') {
+            const phaseMsg = gameInstance.manipulationPhase === 'critical'
+                ? '⚠️ A virada começou. Concentre-se: a próxima pode mudar tudo.'
+                : (gameInstance.manipulationPhase === 'intermediate'
+                    ? 'Você está evoluindo. Falta pouco para a recuperação.'
+                    : 'Ótimo ritmo! Continue — você está no caminho certo.');
+            document.getElementById('auto-play-hint').textContent = phaseMsg;
+        }
+
+
+        if (result.game_over) {
+            // Colapso chegou
+            stopAutoPlay();
+            setTimeout(() => showFinalDashboard(), 1000);
+            gameInProgress = false;
+            return;
+        }
+
+        gameInProgress = false;
+
+        // Intervalos curtos para manter engajamento (acelerar emocionalmente)
+        const phase = gameInstance.manipulationPhase;
+        let min = 650, max = 950;
+        if (phase === 'intermediate') { min = 520; max = 820; }
+        if (phase === 'critical') { min = 380; max = 650; }
+
+        const nextDelay = min + Math.floor(Math.random() * (max - min + 1));
+        autoPlayTimer = setTimeout(tick, nextDelay);
+    };
+
+    // Primeiro tick rápido
+    autoPlayTimer = setTimeout(tick, 350);
+}
+
+function stopAutoPlay() {
+    autoPlayRunning = false;
+    if (autoPlayTimer) {
+        clearTimeout(autoPlayTimer);
+        autoPlayTimer = null;
+    }
+    setAutoPlayUIState(false);
+}
+
+function setAutoPlayUIState(isRunning) {
+    const btn = document.getElementById('auto-play-button');
+    const betBtn = document.getElementById('bet-button');
+
+    if (!btn || !betBtn) return;
+
+    if (isRunning) {
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+        betBtn.disabled = true;
+        betBtn.classList.add('disabled');
+    } else {
+        btn.disabled = false;
+        btn.style.opacity = '';
+        betBtn.disabled = false;
+        betBtn.classList.remove('disabled');
+    }
+}
+
 
 function placeBet() {
     if (gameInProgress) return;
@@ -234,21 +354,22 @@ function startTimeCounter() {
 // ========== CONTROLE DE APOSTA ==========
 
 function setBetAmount(amount) {
-    const maxCoins = currentGameState?.coins || 10;
-    const finalAmount = Math.min(amount, maxCoins);
-    document.getElementById('bet-amount').value = finalAmount;
+    const maxCoins = gameInstance?.coins || 10;
+    const finalAmount = Math.min(parseInt(amount), maxCoins);
+    document.getElementById('bet-amount').value = Math.max(1, finalAmount);
 }
 
 function updateBetAmount(value) {
-    const maxCoins = currentGameState?.coins || 10;
+    const maxCoins = gameInstance?.coins || 10;
     const amount = parseInt(value);
-    
+
     if (isNaN(amount) || amount <= 0) {
         document.getElementById('bet-amount').value = 1;
     } else if (amount > maxCoins) {
         document.getElementById('bet-amount').value = maxCoins;
     }
 }
+
 
 // ========== DASHBOARD FINAL CRÍTICO ==========
 
