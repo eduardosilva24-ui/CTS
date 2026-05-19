@@ -1,313 +1,325 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANÁLISE CRÍTICA: Manipulação Psicológica em Plataformas de Apostas</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="game-logic.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Experiencia educacional e critica sobre design persuasivo, gamificacao e manipulacao psicologica em plataformas de apostas.">
+  <title>CTS UFLA | Simulacao critica de bets</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- TELA DE LOADING INICIAL -->
-    <div id="loading-screen" class="loading-screen">
-        <div class="loading-content">
-            <h1>🎰 PLATAFORMA DE APOSTAS</h1>
-            <p class="subtitle">Análise Crítica de Manipulação Psicológica</p>
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Carregando simulação...</p>
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+  <section id="intro-screen" class="intro-screen" aria-labelledby="intro-title">
+    <div class="intro-shell">
+      <header class="intro-header">
+        <img src="download.jpg" alt="Universidade Federal de Lavras" class="ufla-logo">
+        <div>
+          <p class="eyebrow">Ciencia, Tecnologia e Sociedade</p>
+          <h1 id="intro-title">A arquitetura da esperança artificial</h1>
         </div>
-    </div>
+      </header>
 
-    <!-- CONTAINER PRINCIPAL -->
-    <div id="main-container" class="main-container hidden">
-        <!-- HEADER -->
-        <header class="header">
-            <div class="header-left">
-                <h1 class="app-title">🎰 BETS SIMULAÇÃO</h1>
-                <p class="app-subtitle">Disciplina CTS - Universidade</p>
-            </div>
-            <div class="header-right">
-                <div class="stats-badge">
-                    <span class="stat-label">Apostas:</span>
-                    <span id="total-bets" class="stat-value">0</span>
-                </div>
-                <div class="stats-badge">
-                    <span class="stat-label">Tempo:</span>
-                    <span id="time-playing" class="stat-value">0m</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- CONTEÚDO PRINCIPAL -->
-        <main class="game-container">
-            <!-- SEÇÃO DE SALDO -->
-            <section class="balance-section">
-                <div class="balance-card">
-                    <h2 class="balance-label">Saldo Atual</h2>
-                    <div class="balance-display">
-                        <span id="coins-display" class="coins-number">10</span>
-                        <span class="coins-unit">MOEDAS</span>
-                    </div>
-                    <div class="balance-progress">
-                        <div class="progress-bar">
-                            <div id="progress-fill" class="progress-fill" style="width: 10%"></div>
-                        </div>
-                        <p class="progress-text">
-                            <span id="coins-needed">90</span> moedas para sacar
-                        </p>
-                    </div>
-                    <div class="balance-info">
-                        <div class="info-item">
-                            <span class="info-label">Ganho Total:</span>
-                            <span id="total-won" class="info-value">0</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Perdido Total:</span>
-                            <span id="total-lost" class="info-value">0</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SEÇÃO DE APOSTA -->
-            <section class="bet-section">
-                <div class="bet-card">
-                    <h2 class="bet-title">Faça sua Aposta</h2>
-
-                    <div class="bet-input-group">
-                        <label for="bet-amount" class="bet-label">Valor da Aposta:</label>
-                        <div class="bet-input-wrapper">
-                            <button class="bet-btn-preset" onclick="setBetAmount(1)">1</button>
-                            <button class="bet-btn-preset" onclick="setBetAmount(2)">2</button>
-                            <button class="bet-btn-preset" onclick="setBetAmount(5)">5</button>
-                            <input 
-                                type="number" 
-                                id="bet-amount" 
-                                class="bet-input" 
-                                min="1" 
-                                max="10" 
-                                value="1"
-                                onchange="updateBetAmount(this.value)"
-                            >
-                        </div>
-                    </div>
-
-                    <button id="bet-button" class="btn-bet btn-primary" onclick="placeBet()">
-                        🎲 APOSTAR AGORA
-                    </button>
-
-                    <button id="auto-play-button" class="btn-bet btn-secondary" onclick="startAutoPlay()">
-                        ⚁ Iniciar dinâmica (3–5 min)
-                    </button>
-
-                    <p id="auto-play-hint" class="auto-play-hint">
-                        Simulação crítica em tempo real. O objetivo é analisar como o design prende o usuário.
-                    </p>
-
-                    <button id="cashout-button" class="btn-cashout btn-secondary hidden" onclick="attemptCashout()">
-                        💰 SACAR MOEDAS
-                    </button>
-                </div>
-            </section>
-
-            <!-- SEÇÃO DE RESULTADO -->
-            <section class="result-section">
-                <div id="result-card" class="result-card hidden">
-                    <div class="result-animation" id="result-animation">
-                        <!-- Conteúdo dinâmico -->
-                    </div>
-                    <p id="result-message" class="result-message"></p>
-                    <button class="btn-close-result" onclick="closeResult()">Continuar →</button>
-                </div>
-            </section>
-
-            <!-- SEÇÃO DE MENSAGENS PSICOLÓGICAS -->
-            <section class="messages-section">
-                <div class="messages-box">
-                    <div id="psychological-message" class="psychological-message"></div>
-                </div>
-            </section>
-        </main>
-
-        <!-- FOOTER -->
-        <footer class="footer">
-            <p class="footer-text">Este é um projeto educacional para demonstrar criticamente técnicas de manipulação psicológica em plataformas de apostas.</p>
-            <button class="btn-reset" onclick="resetGame()">🔄 Novo Jogo</button>
-        </footer>
-    </div>
-
-    <!-- MODAL CONFIRMAÇÃO SAQUE -->
-    <div id="cashout-modal" class="modal hidden">
-        <div class="modal-content modal-warning">
-            <h2>⚠️ CONFIRMAÇÃO CRÍTICA</h2>
-            <p id="cashout-modal-message"></p>
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeCashoutModal()">Voltar ao Jogo</button>
-                <button class="btn-confirm" onclick="confirmCashout()">Tenho Certeza - Sacar Agora</button>
-            </div>
+      <div class="intro-grid">
+        <div class="intro-copy">
+          <p class="intro-kicker">Experiencia educacional critica</p>
+          <p class="intro-lead">
+            Esta simulacao mostra, em tempo real, como interfaces de apostas podem transformar
+            recompensa variavel, quase-vitorias e pressao emocional em permanencia.
+          </p>
+          <div class="intro-warning" role="note">
+            Nao ha dinheiro real, premio real ou incentivo a apostar. O objetivo e revelar a
+            manipulacao, nao reproduzi-la como entretenimento.
+          </div>
+          <button id="start-experience" class="primary-action" type="button">
+            Iniciar experiencia critica
+          </button>
         </div>
-    </div>
 
-    <!-- TELA FINAL COM DASHBOARD -->
-    <div id="final-screen" class="final-screen hidden">
-        <div class="final-content">
-            <div class="final-header">
-                <h1 class="final-title">📌 ANÁLISE FINAL: SUA SESSÃO DE JOGO</h1>
-            </div>
-
-            <div class="dashboard-grid">
-                <!-- Coluna 1: Ganhos e Perdas -->
-                <div class="dashboard-card critical">
-                    <h3>💸 BALANÇO FINANCEIRO</h3>
-                    <div class="stat-row">
-                        <span class="stat-name">Moedas Iniciais:</span>
-                        <span id="final-initial" class="stat-final">10</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-name">Moedas Finais:</span>
-                        <span id="final-final" class="stat-final">0</span>
-                    </div>
-                    <div class="stat-row highlight">
-                        <span class="stat-name">Lucro/Prejuízo:</span>
-                        <span id="final-net" class="stat-final">-10</span>
-                    </div>
-                </div>
-
-                <!-- Coluna 2: Estatísticas de Jogo -->
-                <div class="dashboard-card">
-                    <h3>🎲 ESTATÍSTICAS DE JOGO</h3>
-                    <div class="stat-row">
-                        <span class="stat-name">Total de Apostas:</span>
-                        <span id="final-bets" class="stat-final">0</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-name">Total Ganhado:</span>
-                        <span id="final-won" class="stat-final">0</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-name">Total Perdido:</span>
-                        <span id="final-lost" class="stat-final">0</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-name">Quase Vitórias:</span>
-                        <span id="final-near-miss" class="stat-final">0</span>
-                    </div>
-                </div>
-
-                <!-- Coluna 3: Análise Comportamental -->
-                <div class="dashboard-card warning">
-                    <h3>🧠 ANÁLISE COMPORTAMENTAL</h3>
-                    <div class="stat-row">
-                        <span class="stat-name">Tempo Jogando:</span>
-                        <span id="final-time" class="stat-final">0m</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-name">Máximo Alcançado:</span>
-                        <span id="final-max" class="stat-final">10</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-name">Maior Sequência de Perdas:</span>
-                        <span id="final-loss-streak" class="stat-final">0</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-name">Tentativas de Saque:</span>
-                        <span id="final-cashout-attempts" class="stat-final">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ANÁLISE CRÍTICA PROFUNDA -->
-            <section class="critical-analysis">
-                <h2>🔍 COMO O SISTEMA MANIPULOU VOCÊ</h2>
-                <div class="analysis-cards">
-                    <div class="analysis-item">
-                        <h4>1️⃣ Reforço Variável (Variable Reward System)</h4>
-                        <p>O sistema te ofertou recompensas IMPREVISÍVEIS. Você nunca sabia quando ganharia, criando um ciclo viciante. Seu cérebro libera dopamina a CADA aposta, não apenas nas vitórias.</p>
-                    </div>
-                    <div class="analysis-item">
-                        <h4>2️⃣ Efeito "Quase Ganhar" (Near Miss Effect)</h4>
-                        <p id="analysis-near-miss">Você experimentou <span id="analysis-near-miss-count">0</span> "quase vitórias". Estas ativam o mesmo sistema de recompensa que VITÓRIAS, mantendo você psicologicamente preso.</p>
-                    </div>
-                    <div class="analysis-item">
-                        <h4>3️⃣ Ilusão de Controle</h4>
-                        <p>Você acreditou que ESCOLHER o valor da aposta lhe dava controle. Na verdade, o algoritmo controlava completamente as odds por trás das cenas.</p>
-                    </div>
-                    <div class="analysis-item">
-                        <h4>4️⃣ Escalada de Comprometimento (Sunk Cost Fallacy)</h4>
-                        <p id="analysis-sunk-cost">Você apostou <span id="analysis-total-bets-text">0</span> vezes. Quanto mais você jogava, mais achava que "TINHA" que continuar para recuperar as perdas.</p>
-                    </div>
-                    <div class="analysis-item">
-                        <h4>5️⃣ FOMO - Medo de Perder Oportunidades</h4>
-                        <p>Mensagens como "Você está tão perto!" e "A próxima pode mudar tudo!" criaram urgência emocional ARTIFICIAL.</p>
-                    </div>
-                    <div class="analysis-item">
-                        <h4>6️⃣ Manipulação Emocional Visual</h4>
-                        <p>Cada vitória teve CELEBRAÇÕES EXAGERADAS com efeitos visuais. As derrotas foram minimizadas. Seu cérebro associou o jogo com emoção positiva.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- COMPARAÇÃO COM REALIDADE FINANCEIRA -->
-            <section class="reality-check">
-                <h2>⚠️ O QUE VOCÊ DEIXOU DE FAZER COM ESSE TEMPO E DINHEIRO</h2>
-                <div id="reality-messages" class="reality-messages"></div>
-            </section>
-
-            <!-- MENSAGEM FINAL IMPACTANTE -->
-            <section class="final-message-section">
-                <div class="final-message-box">
-                    <h2 class="message-highlight">❌ A VERDADE SOBRE PLATAFORMAS DE APOSTAS</h2>
-                    <div class="message-content">
-                        <blockquote>
-                            <p>"NENHUMA BET MUDA A VIDA DAS PESSOAS COMUNS."</p>
-                            <p>"ELAS LUCRAM DESTRUINDO FINANCEIRAMENTE PESSOAS VULNERÁVEIS."</p>
-                        </blockquote>
-
-                        <h3>O Sistema foi feito para:</h3>
-                        <ul class="message-list">
-                            <li>✗ Manter você jogando — NÃO para fazer você vencer</li>
-                            <li>✗ Maximizar seu TEMPO na plataforma</li>
-                            <li>✗ Extrair o máximo de sua ESPERANÇA</li>
-                            <li>✗ Explorar sua capacidade de tomar decisões racionais</li>
-                            <li>✗ Transformar sua vulnerabilidade emocional em LUCRO</li>
-                        </ul>
-
-                        <h3>O Verdadeiro Produto das Bets:</h3>
-                        <p class="highlight-text">Não é o jogo. É <strong>SUA ATENÇÃO, SEU TEMPO E SUA ESPERANÇA.</strong></p>
-
-                        <h3>Números Que Importam:</h3>
-                        <ul class="message-list">
-                            <li>📌 Você perdeu: <span id="final-message-lost" class="highlight-number">0</span> moedas</li>
-                            <li>⏱️ Você gastou: <span id="final-message-time" class="highlight-number">0</span> minutos</li>
-                            <li>🎲 Você fez: <span id="final-message-bets" class="highlight-number">0</span> apostas</li>
-                            <li>💰 A plataforma lucrou: <span id="final-message-platform" class="highlight-number">0</span> moedas</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- CHAMADA PARA AÇÃO -->
-            <section class="call-to-action">
-                <div class="cta-box">
-                    <h2>📣 CONCLUSÃO PARA SEU RELATÓRIO</h2>
-                    <p>Este projeto demonstra como plataformas de apostas REAIS utilizam:</p>
-                    <ul>
-                        <li>Neurociência comportamental</li>
-                        <li>Algoritmos manipulativos</li>
-                        <li>Design persuasivo</li>
-                        <li>Estímulos psicológicos</li>
-                    </ul>
-                    <p>...para criar sistemas <strong>deliberadamente viciantes</strong> que extraem valor dos usuários.</p>
-
-                    <p class="cta-emphasis">As bets não são jogos. São armadilhas psicológicas com propósito comercial.</p>
-
-                    <button class="btn-restart-final" onclick="resetGame()">🔄 Tentar Novamente</button>
-                </div>
-            </section>
+        <div class="intro-signal" aria-hidden="true">
+          <div class="signal-ring"></div>
+          <div class="signal-orbit orbit-a"></div>
+          <div class="signal-orbit orbit-b"></div>
+          <div class="signal-core">
+            <span>10</span>
+            <small>moedas iniciais</small>
+          </div>
         </div>
+      </div>
     </div>
+  </section>
 
-    <script src="script.js"></script>
+  <main id="app" class="app is-hidden">
+    <header class="topbar">
+      <a class="brand" href="#game-panel" aria-label="Ir para a simulacao">
+        <img src="download.jpg" alt="Universidade Federal de Lavras" class="brand-logo">
+        <span>
+          <strong>UFLA | CTS</strong>
+          <small>Simulacao critica de retencao digital</small>
+        </span>
+      </a>
+
+      <div class="topbar-metrics" aria-label="Indicadores da sessao">
+        <div class="metric-pill">
+          <span>Tempo</span>
+          <strong id="elapsed-time">00:00</strong>
+        </div>
+        <div class="metric-pill">
+          <span>Rodadas</span>
+          <strong id="round-count">0</strong>
+        </div>
+        <div class="metric-pill danger">
+          <span>Perdido</span>
+          <strong id="lost-count">0</strong>
+        </div>
+      </div>
+
+      <button id="reveal-now" class="ghost-action" type="button">Revelar analise</button>
+    </header>
+
+    <section id="game-panel" class="experience-grid" aria-label="Simulacao interativa">
+      <section class="balance-panel panel" aria-labelledby="balance-title">
+        <div class="panel-label">Carteira simulada</div>
+        <h2 id="balance-title" class="balance-title">
+          <span id="coin-balance">10</span>
+          <small>moedas</small>
+        </h2>
+
+        <div class="cashout-row">
+          <span>Saque liberado em 100 moedas</span>
+          <strong id="cashout-distance">faltam 90</strong>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="cashout-progress" class="progress-fill"></div>
+          <div id="progress-glow" class="progress-glow"></div>
+        </div>
+
+        <div class="hope-meter" aria-label="Medidor de impulso exibido pela plataforma">
+          <div>
+            <span>Impulso da sorte</span>
+            <strong id="hope-score">18%</strong>
+          </div>
+          <div class="hope-track">
+            <div id="hope-fill" class="hope-fill"></div>
+          </div>
+        </div>
+
+        <div class="wallet-stats">
+          <div>
+            <span>Ganho exibido</span>
+            <strong id="gross-won">0</strong>
+          </div>
+          <div>
+            <span>Apostas perdidas</span>
+            <strong id="gross-lost">0</strong>
+          </div>
+          <div>
+            <span>Maior saldo</span>
+            <strong id="peak-balance">10</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="play-panel panel" aria-labelledby="play-title">
+        <div class="panel-label">Rodada ao vivo</div>
+        <h2 id="play-title">Sequencia premiada</h2>
+
+        <div class="slot-stage" aria-live="polite" aria-label="Resultado visual da rodada">
+          <div class="reel" id="reel-1">7</div>
+          <div class="reel" id="reel-2">7</div>
+          <div class="reel" id="reel-3">7</div>
+        </div>
+
+        <div id="result-banner" class="result-banner" aria-live="polite">
+          A experiencia comeca com 10 moedas. O saque so aparece em 100.
+        </div>
+
+        <div class="bet-controls" aria-label="Controle de valor da aposta">
+          <span>Valor da aposta</span>
+          <div class="stake-options" role="group" aria-label="Selecionar aposta">
+            <button class="stake-option is-active" data-stake="1" type="button">1</button>
+            <button class="stake-option" data-stake="2" type="button">2</button>
+            <button class="stake-option" data-stake="3" type="button">3</button>
+            <button class="stake-option" data-stake="5" type="button">5</button>
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button id="manual-play" class="primary-action compact" type="button">Girar agora</button>
+          <button id="auto-play-toggle" class="secondary-action" type="button">Modo automatico ativo</button>
+        </div>
+
+        <button id="cashout-button" class="cashout-action" type="button" disabled>
+          Sacar moedas
+        </button>
+      </section>
+
+      <aside class="persuasion-panel panel" aria-labelledby="persuasion-title">
+        <div class="panel-label">Feed emocional</div>
+        <h2 id="persuasion-title">Mensagens da plataforma</h2>
+        <div id="persuasion-message" class="persuasion-message" aria-live="polite">
+          Hoje parece um bom dia para continuar.
+        </div>
+
+        <div class="phase-list" aria-label="Gatilhos de retencao ativos">
+          <div id="phase-engagement" class="phase-item is-active">
+            <span>1</span>
+            <p>Confiança</p>
+          </div>
+          <div id="phase-retention" class="phase-item">
+            <span>2</span>
+            <p>Retencao</p>
+          </div>
+          <div id="phase-collapse" class="phase-item">
+            <span>3</span>
+            <p>Colapso</p>
+          </div>
+        </div>
+
+        <div class="fomo-card">
+          <span id="fomo-label">bonus relampago</span>
+          <strong id="fomo-timer">00:18</strong>
+          <p id="fomo-copy">Sua janela de oportunidade esta aberta.</p>
+        </div>
+      </aside>
+
+      <section class="impact-panel panel" aria-labelledby="impact-title">
+        <div class="panel-label">Custo social traduzido</div>
+        <h2 id="impact-title">O dinheiro ganha peso com o tempo</h2>
+        <ul id="impact-feed" class="impact-feed" aria-live="polite"></ul>
+      </section>
+    </section>
+  </main>
+
+  <section id="final-screen" class="final-screen is-hidden" aria-labelledby="final-title">
+    <div class="final-shell">
+      <header class="final-hero">
+        <img src="download.jpg" alt="Universidade Federal de Lavras" class="final-logo">
+        <p class="eyebrow">Analise CTS da sessao</p>
+        <h2 id="final-title">Voce nao estava jogando contra a sorte. Estava jogando contra um sistema.</h2>
+        <p>
+          A simulacao abaixo revela os mecanismos usados para manter a esperanca ativa enquanto
+          o saldo era drenado antes do saque.
+        </p>
+      </header>
+
+      <section class="dashboard-grid" aria-label="Dashboard final">
+        <article class="dashboard-card critical">
+          <span>Saldo final</span>
+          <strong id="final-balance" data-count="0">0</strong>
+          <p>O saque nunca foi alcancado.</p>
+        </article>
+        <article class="dashboard-card">
+          <span>Total perdido</span>
+          <strong id="final-lost" data-count="0">0</strong>
+          <p>A soma das apostas que a plataforma absorveu.</p>
+        </article>
+        <article class="dashboard-card">
+          <span>Total ganho</span>
+          <strong id="final-won" data-count="0">0</strong>
+          <p>Pequenas recompensas ampliadas visualmente.</p>
+        </article>
+        <article class="dashboard-card critical">
+          <span>Lucro da plataforma</span>
+          <strong id="final-platform" data-count="0">0</strong>
+          <p>A margem aparece quando o ciclo termina.</p>
+        </article>
+        <article class="dashboard-card">
+          <span>Apostas feitas</span>
+          <strong id="final-rounds" data-count="0">0</strong>
+          <p>Repeticao guiada por reforco intermitente.</p>
+        </article>
+        <article class="dashboard-card">
+          <span>Quase-vitorias</span>
+          <strong id="final-near-misses" data-count="0">0</strong>
+          <p>Derrotas desenhadas para parecer progresso.</p>
+        </article>
+        <article class="dashboard-card">
+          <span>Tempo jogando</span>
+          <strong id="final-time">00:00</strong>
+          <p>Atencao capturada por ciclos curtos.</p>
+        </article>
+        <article class="dashboard-card">
+          <span>Maior sequencia de perdas</span>
+          <strong id="final-loss-streak" data-count="0">0</strong>
+          <p>O sistema suavizou a queda com promessas.</p>
+        </article>
+        <article class="dashboard-card">
+          <span>Maior sequencia de ganhos</span>
+          <strong id="final-win-streak" data-count="0">0</strong>
+          <p>A fase inicial criou confianca artificial.</p>
+        </article>
+      </section>
+
+      <section class="charts-grid" aria-label="Graficos da sessao">
+        <article class="chart-panel">
+          <div class="chart-heading">
+            <h3>Trajetoria do saldo</h3>
+            <span>linha do tempo</span>
+          </div>
+          <svg id="balance-chart" class="line-chart" viewBox="0 0 640 220" role="img" aria-label="Grafico do saldo ao longo da sessao"></svg>
+        </article>
+
+        <article class="chart-panel">
+          <div class="chart-heading">
+            <h3>Engenharia emocional</h3>
+            <span>gatilhos aplicados</span>
+          </div>
+          <div id="trigger-bars" class="trigger-bars"></div>
+        </article>
+      </section>
+
+      <section class="analysis-section" aria-labelledby="analysis-title">
+        <p class="eyebrow">Como a manipulacao funcionou</p>
+        <h3 id="analysis-title">A experiencia foi desenhada para parecer habilidade, urgencia e recuperacao.</h3>
+        <div class="analysis-grid">
+          <article>
+            <h4>Reforco variavel</h4>
+            <p>As recompensas foram imprevisiveis. O cerebro aprende a perseguir a possibilidade, nao apenas a vitoria.</p>
+          </article>
+          <article>
+            <h4>Quase-vitoria</h4>
+            <p>Resultados quase positivos foram mostrados como sinal de proximidade, embora continuassem sendo perda.</p>
+          </article>
+          <article>
+            <h4>Ilusao de controle</h4>
+            <p>Escolher o valor da aposta parecia autonomia, mas as probabilidades mudavam de acordo com a fase da retencao.</p>
+          </article>
+          <article>
+            <h4>Escalada de comprometimento</h4>
+            <p>Quanto mais rodadas aconteciam, mais as mensagens sugeriam que parar seria jogar fora o que ja foi investido.</p>
+          </article>
+          <article>
+            <h4>FOMO e urgencia</h4>
+            <p>Contadores, bonus temporarios e frases de pressao criaram medo artificial de perder a proxima oportunidade.</p>
+          </article>
+          <article>
+            <h4>Celebracao assimetrica</h4>
+            <p>Vitorias pequenas receberam confete, brilho e som visual; perdas foram minimizadas como pausas temporarias.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="reality-section" aria-labelledby="reality-title">
+        <p class="eyebrow">Impacto social das perdas</p>
+        <h3 id="reality-title">Quando a moeda vira vida cotidiana, a interface perde o brilho.</h3>
+        <div id="final-reality-list" class="final-reality-list"></div>
+      </section>
+
+      <section class="closing-section" aria-label="Conclusao critica">
+        <blockquote>
+          <p>O sistema foi feito para manter voce jogando, nao para fazer voce vencer.</p>
+          <p>Nenhuma bet enriquece pessoas comuns. Elas lucram explorando esperanca, vulnerabilidade e compulsao.</p>
+          <p>O verdadeiro produto das bets nao e o jogo. E o tempo, a atencao e o dinheiro do jogador.</p>
+        </blockquote>
+        <button id="restart-experience" class="primary-action" type="button">Reiniciar demonstracao</button>
+      </section>
+    </div>
+  </section>
+
+  <div id="toast-layer" class="toast-layer" aria-live="polite"></div>
+  <div id="confetti-layer" class="confetti-layer" aria-hidden="true"></div>
+
+  <script src="script.js"></script>
 </body>
 </html>
-
