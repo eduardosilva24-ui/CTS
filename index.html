@@ -73,7 +73,7 @@
             <section class="bet-section">
                 <div class="bet-card">
                     <h2 class="bet-title">Faça sua Aposta</h2>
-                    
+
                     <div class="bet-input-group">
                         <label for="bet-amount" class="bet-label">Valor da Aposta:</label>
                         <div class="bet-input-wrapper">
@@ -97,13 +97,12 @@
                     </button>
 
                     <button id="auto-play-button" class="btn-bet btn-secondary" onclick="startAutoPlay()">
-                        ⚡ Iniciar dinâmica (3–5 min)
+                        ⚁ Iniciar dinâmica (3–5 min)
                     </button>
 
                     <p id="auto-play-hint" class="auto-play-hint">
                         Simulação crítica em tempo real. O objetivo é analisar como o design prende o usuário.
                     </p>
-
 
                     <button id="cashout-button" class="btn-cashout btn-secondary hidden" onclick="attemptCashout()">
                         💰 SACAR MOEDAS
@@ -153,7 +152,7 @@
     <div id="final-screen" class="final-screen hidden">
         <div class="final-content">
             <div class="final-header">
-                <h1 class="final-title">📊 ANÁLISE FINAL: SUA SESSÃO DE JOGO</h1>
+                <h1 class="final-title">📌 ANÁLISE FINAL: SUA SESSÃO DE JOGO</h1>
             </div>
 
             <div class="dashboard-grid">
@@ -251,9 +250,7 @@
             <!-- COMPARAÇÃO COM REALIDADE FINANCEIRA -->
             <section class="reality-check">
                 <h2>⚠️ O QUE VOCÊ DEIXOU DE FAZER COM ESSE TEMPO E DINHEIRO</h2>
-                <div id="reality-messages" class="reality-messages">
-                    <!-- Mensagens dinâmicas -->
-                </div>
+                <div id="reality-messages" class="reality-messages"></div>
             </section>
 
             <!-- MENSAGEM FINAL IMPACTANTE -->
@@ -280,7 +277,7 @@
 
                         <h3>Números Que Importam:</h3>
                         <ul class="message-list">
-                            <li>📊 Você perdeu: <span id="final-message-lost" class="highlight-number">0</span> moedas</li>
+                            <li>📌 Você perdeu: <span id="final-message-lost" class="highlight-number">0</span> moedas</li>
                             <li>⏱️ Você gastou: <span id="final-message-time" class="highlight-number">0</span> minutos</li>
                             <li>🎲 Você fez: <span id="final-message-bets" class="highlight-number">0</span> apostas</li>
                             <li>💰 A plataforma lucrou: <span id="final-message-platform" class="highlight-number">0</span> moedas</li>
@@ -292,7 +289,7 @@
             <!-- CHAMADA PARA AÇÃO -->
             <section class="call-to-action">
                 <div class="cta-box">
-                    <h2>🎓 CONCLUSÃO PARA SEU RELATÓRIO</h2>
+                    <h2>📣 CONCLUSÃO PARA SEU RELATÓRIO</h2>
                     <p>Este projeto demonstra como plataformas de apostas REAIS utilizam:</p>
                     <ul>
                         <li>Neurociência comportamental</li>
@@ -304,9 +301,7 @@
 
                     <p class="cta-emphasis">As bets não são jogos. São armadilhas psicológicas com propósito comercial.</p>
 
-                    <button class="btn-restart-final" onclick="resetGame()">
-                        🔄 Tentar Novamente
-                    </button>
+                    <button class="btn-restart-final" onclick="resetGame()">🔄 Tentar Novamente</button>
                 </div>
             </section>
         </div>
@@ -315,3 +310,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
