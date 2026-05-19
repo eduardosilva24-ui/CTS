@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANÁLISE CRÍTICA: Manipulação Psicológica em Plataformas de Apostas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- TELA DE LOADING INICIAL -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <h1>🎰 PLATAFORMA DE APOSTAS</h1>
+            <p class="subtitle">Análise Crítica de Manipulação Psicológica</p>
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Carregando simulação...</p>
+        </div>
+    </div>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <div id="main-container" class="main-container hidden">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="app-title">🎰 BETS SIMULAÇÃO</h1>
+                <p class="app-subtitle">Disciplina CTS - Universidade</p>
+            </div>
+            <div class="header-right">
+                <div class="stats-badge">
+                    <span class="stat-label">Apostas:</span>
+                    <span id="total-bets" class="stat-value">0</span>
+                </div>
+                <div class="stats-badge">
+                    <span class="stat-label">Tempo:</span>
+                    <span id="time-playing" class="stat-value">0m</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="game-container">
+            <!-- SEÇÃO DE SALDO -->
+            <section class="balance-section">
+                <div class="balance-card">
+                    <h2 class="balance-label">Saldo Atual</h2>
+                    <div class="balance-display">
+                        <span id="coins-display" class="coins-number">10</span>
+                        <span class="coins-unit">MOEDAS</span>
+                    </div>
+                    <div class="balance-progress">
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill" style="width: 10%"></div>
+                        </div>
+                        <p class="progress-text">
+                            <span id="coins-needed">90</span> moedas para sacar
+                        </p>
+                    </div>
+                    <div class="balance-info">
+                        <div class="info-item">
+                            <span class="info-label">Ganho Total:</span>
+                            <span id="total-won" class="info-value">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Perdido Total:</span>
+                            <span id="total-lost" class="info-value">0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO DE APOSTA -->
+            <section class="bet-section">
+                <div class="bet-card">
+                    <h2 class="bet-title">Faça sua Aposta</h2>
+                    
+                    <div class="bet-input-group">
+                        <label for="bet-amount" class="bet-label">Valor da Aposta:</label>
+                        <div class="bet-input-wrapper">
+                            <button class="bet-btn-preset" onclick="setBetAmount(1)">1</button>
+                            <button class="bet-btn-preset" onclick="setBetAmount(2)">2</button>
+                            <button class="bet-btn-preset" onclick="setBetAmount(5)">5</button>
+                            <input 
+                                type="number" 
+                                id="bet-amount" 
+                                class="bet-input" 
+                                min="1" 
+                                max="10" 
+                                value="1"
+                                onchange="updateBetAmount(this.value)"
+                            >
+                        </div>
+                    </div>
+
+                    <button id="bet-button" class="btn-bet btn-primary" onclick="placeBet()">
+                        🎲 APOSTAR AGORA
+                    </button>
+
+                    <button id="cashout-button" class="btn-cashout btn-secondary hidden" onclick="attemptCashout()">
+                        💰 SACAR MOEDAS
+                    </button>
+                </div>
+            </section>
+
+            <!-- SEÇÃO DE RESULTADO -->
+            <section class="result-section">
+                <div id="result-card" class="result-card hidden">
+                    <div class="result-animation" id="result-animation">
+                        <!-- Conteúdo dinâmico -->
+                    </div>
+                    <p id="result-message" class="result-message"></p>
+                    <button class="btn-close-result" onclick="closeResult()">Continuar →</button>
+                </div>
+            </section>
+
+            <!-- SEÇÃO DE MENSAGENS PSICOLÓGICAS -->
+            <section class="messages-section">
+                <div class="messages-box">
+                    <div id="psychological-message" class="psychological-message"></div>
+                </div>
+            </section>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p class="footer-text">Este é um projeto educacional para demonstrar criticamente técnicas de manipulação psicológica em plataformas de apostas.</p>
+            <button class="btn-reset" onclick="resetGame()">🔄 Novo Jogo</button>
+        </footer>
+    </div>
+
+    <!-- MODAL CONFIRMAÇÃO SAQUE -->
+    <div id="cashout-modal" class="modal hidden">
+        <div class="modal-content modal-warning">
+            <h2>⚠️ CONFIRMAÇÃO CRÍTICA</h2>
+            <p id="cashout-modal-message"></p>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeCashoutModal()">Voltar ao Jogo</button>
+                <button class="btn-confirm" onclick="confirmCashout()">Tenho Certeza - Sacar Agora</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA FINAL COM DASHBOARD -->
+    <div id="final-screen" class="final-screen hidden">
+        <div class="final-content">
+            <div class="final-header">
+                <h1 class="final-title">📊 ANÁLISE FINAL: SUA SESSÃO DE JOGO</h1>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Coluna 1: Ganhos e Perdas -->
+                <div class="dashboard-card critical">
+                    <h3>💸 BALANÇO FINANCEIRO</h3>
+                    <div class="stat-row">
+                        <span class="stat-name">Moedas Iniciais:</span>
+                        <span id="final-initial" class="stat-final">10</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Moedas Finais:</span>
+                        <span id="final-final" class="stat-final">0</span>
+                    </div>
+                    <div class="stat-row highlight">
+                        <span class="stat-name">Lucro/Prejuízo:</span>
+                        <span id="final-net" class="stat-final">-10</span>
+                    </div>
+                </div>
+
+                <!-- Coluna 2: Estatísticas de Jogo -->
+                <div class="dashboard-card">
+                    <h3>🎲 ESTATÍSTICAS DE JOGO</h3>
+                    <div class="stat-row">
+                        <span class="stat-name">Total de Apostas:</span>
+                        <span id="final-bets" class="stat-final">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Total Ganhado:</span>
+                        <span id="final-won" class="stat-final">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Total Perdido:</span>
+                        <span id="final-lost" class="stat-final">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Quase Vitórias:</span>
+                        <span id="final-near-miss" class="stat-final">0</span>
+                    </div>
+                </div>
+
+                <!-- Coluna 3: Análise Comportamental -->
+                <div class="dashboard-card warning">
+                    <h3>🧠 ANÁLISE COMPORTAMENTAL</h3>
+                    <div class="stat-row">
+                        <span class="stat-name">Tempo Jogando:</span>
+                        <span id="final-time" class="stat-final">0m</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Máximo Alcançado:</span>
+                        <span id="final-max" class="stat-final">10</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Maior Sequência de Perdas:</span>
+                        <span id="final-loss-streak" class="stat-final">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Tentativas de Saque:</span>
+                        <span id="final-cashout-attempts" class="stat-final">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANÁLISE CRÍTICA PROFUNDA -->
+            <section class="critical-analysis">
+                <h2>🔍 COMO O SISTEMA MANIPULOU VOCÊ</h2>
+                <div class="analysis-cards">
+                    <div class="analysis-item">
+                        <h4>1️⃣ Reforço Variável (Variable Reward System)</h4>
+                        <p>O sistema te ofertou recompensas IMPREVISÍVEIS. Você nunca sabia quando ganharia, criando um ciclo viciante. Seu cérebro libera dopamina a CADA aposta, não apenas nas vitórias.</p>
+                    </div>
+                    <div class="analysis-item">
+                        <h4>2️⃣ Efeito "Quase Ganhar" (Near Miss Effect)</h4>
+                        <p id="analysis-near-miss">Você experimentou <span id="analysis-near-miss-count">0</span> "quase vitórias". Estas ativam o mesmo sistema de recompensa que VITÓRIAS, mantendo você psicologicamente preso.</p>
+                    </div>
+                    <div class="analysis-item">
+                        <h4>3️⃣ Ilusão de Controle</h4>
+                        <p>Você acreditou que ESCOLHER o valor da aposta lhe dava controle. Na verdade, o algoritmo controlava completamente as odds por trás das cenas.</p>
+                    </div>
+                    <div class="analysis-item">
+                        <h4>4️⃣ Escalada de Comprometimento (Sunk Cost Fallacy)</h4>
+                        <p id="analysis-sunk-cost">Você apostou <span id="analysis-total-bets-text">0</span> vezes. Quanto mais você jogava, mais achava que "TINHA" que continuar para recuperar as perdas.</p>
+                    </div>
+                    <div class="analysis-item">
+                        <h4>5️⃣ FOMO - Medo de Perder Oportunidades</h4>
+                        <p>Mensagens como "Você está tão perto!" e "A próxima pode mudar tudo!" criaram urgência emocional ARTIFICIAL.</p>
+                    </div>
+                    <div class="analysis-item">
+                        <h4>6️⃣ Manipulação Emocional Visual</h4>
+                        <p>Cada vitória teve CELEBRAÇÕES EXAGERADAS com efeitos visuais. As derrotas foram minimizadas. Seu cérebro associou o jogo com emoção positiva.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- COMPARAÇÃO COM REALIDADE FINANCEIRA -->
+            <section class="reality-check">
+                <h2>⚠️ O QUE VOCÊ DEIXOU DE FAZER COM ESSE TEMPO E DINHEIRO</h2>
+                <div id="reality-messages" class="reality-messages">
+                    <!-- Mensagens dinâmicas -->
+                </div>
+            </section>
+
+            <!-- MENSAGEM FINAL IMPACTANTE -->
+            <section class="final-message-section">
+                <div class="final-message-box">
+                    <h2 class="message-highlight">❌ A VERDADE SOBRE PLATAFORMAS DE APOSTAS</h2>
+                    <div class="message-content">
+                        <blockquote>
+                            <p>"NENHUMA BET MUDA A VIDA DAS PESSOAS COMUNS."</p>
+                            <p>"ELAS LUCRAM DESTRUINDO FINANCEIRAMENTE PESSOAS VULNERÁVEIS."</p>
+                        </blockquote>
+
+                        <h3>O Sistema foi feito para:</h3>
+                        <ul class="message-list">
+                            <li>✗ Manter você jogando — NÃO para fazer você vencer</li>
+                            <li>✗ Maximizar seu TEMPO na plataforma</li>
+                            <li>✗ Extrair o máximo de sua ESPERANÇA</li>
+                            <li>✗ Explorar sua capacidade de tomar decisões racionais</li>
+                            <li>✗ Transformar sua vulnerabilidade emocional em LUCRO</li>
+                        </ul>
+
+                        <h3>O Verdadeiro Produto das Bets:</h3>
+                        <p class="highlight-text">Não é o jogo. É <strong>SUA ATENÇÃO, SEU TEMPO E SUA ESPERANÇA.</strong></p>
+
+                        <h3>Números Que Importam:</h3>
+                        <ul class="message-list">
+                            <li>📊 Você perdeu: <span id="final-message-lost" class="highlight-number">0</span> moedas</li>
+                            <li>⏱️ Você gastou: <span id="final-message-time" class="highlight-number">0</span> minutos</li>
+                            <li>🎲 Você fez: <span id="final-message-bets" class="highlight-number">0</span> apostas</li>
+                            <li>💰 A plataforma lucrou: <span id="final-message-platform" class="highlight-number">0</span> moedas</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CHAMADA PARA AÇÃO -->
+            <section class="call-to-action">
+                <div class="cta-box">
+                    <h2>🎓 CONCLUSÃO PARA SEU RELATÓRIO</h2>
+                    <p>Este projeto demonstra como plataformas de apostas REAIS utilizam:</p>
+                    <ul>
+                        <li>Neurociência comportamental</li>
+                        <li>Algoritmos manipulativos</li>
+                        <li>Design persuasivo</li>
+                        <li>Estímulos psicológicos</li>
+                    </ul>
+                    <p>...para criar sistemas <strong>deliberadamente viciantes</strong> que extraem valor dos usuários.</p>
+
+                    <p class="cta-emphasis">As bets não são jogos. São armadilhas psicológicas com propósito comercial.</p>
+
+                    <button class="btn-restart-final" onclick="resetGame()">
+                        🔄 Tentar Novamente
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
