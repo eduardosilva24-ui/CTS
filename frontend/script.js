@@ -1,49 +1,38 @@
 /* =======================================
    SCRIPT PRINCIPAL - LÓGICA DO JOGO
+   Versão 100% Cliente (GitHub Pages)
    ======================================= */
 
-const API_BASE = 'http://localhost:5000/api';
-let sessionId = `session_${Date.now()}`;
-let currentGameState = null;
+let gameInstance = new BetGameManipulator();
 let gameInProgress = false;
 let timeInterval = null;
 let totalSeconds = 0;
 
 // ========== INICIALIZAÇÃO ==========
 
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', () => {
     // Simular loading
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Esconder loading e mostrar jogo
-    document.getElementById('loading-screen').classList.add('hidden');
-    document.getElementById('main-container').classList.remove('hidden');
-    
-    // Iniciar jogo
-    await startGame();
-    startTimeCounter();
+    setTimeout(() => {
+        // Esconder loading e mostrar jogo
+        document.getElementById('loading-screen').classList.add('hidden');
+        document.getElementById('main-container').classList.remove('hidden');
+        
+        // Iniciar jogo
+        startGame();
+        startTimeCounter();
+    }, 2000);
 });
 
 // ========== FUNÇÕES PRINCIPAIS ==========
 
-async function startGame() {
-    try {
-        const response = await fetch(`${API_BASE}/game/start`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId })
-        });
-        
-        const data = await response.json();
-        updateUI();
-        showMessage("Bem-vindo! Você começa com 10 moedas. Você precisa atingir 100 moedas para sacar!", "welcome");
-    } catch (error) {
-        console.error('Erro ao iniciar jogo:', error);
-        showMessage("Erro ao conectar com o servidor. Certifique-se que está rodando.", "error");
-    }
+function startGame() {
+    // Reinicializar jogo
+    gameInstance = new BetGameManipulator();
+    updateUI();
+    showMessage("Bem-vindo! Você começa com 10 moedas. Você precisa atingir 100 moedas para sacar!", "welcome");
 }
 
-async function placeBet() {
+function placeBet() {
     if (gameInProgress) return;
     
     gameInProgress = true;
@@ -55,92 +44,53 @@ async function placeBet() {
         return;
     }
     
-    try {
-        const response = await fetch(`${API_BASE}/game/bet`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                session_id: sessionId,
-                bet_amount: betAmount
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (!result.success) {
-            showMessage("Aposta inválida: " + result.error, "error");
-            gameInProgress = false;
-            return;
-        }
-        
-        // Exibir resultado com animações
-        displayBetResult(result);
-        
-        // Atualizar UI
-        await updateUI();
-        
-        // Mostrar mensagem psicológica
-        if (result.message) {
-            showMessage(result.message, result.is_win ? "win" : "loss");
-        }
-        
-        // Verificar se jogo terminou
-        if (result.game_over) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+    // Fazer aposta localmente
+    const result = gameInstance.placeBet(betAmount);
+    
+    if (!result.success) {
+        showMessage("Aposta inválida: " + result.error, "error");
+        gameInProgress = false;
+        return;
+    }
+    
+    // Exibir resultado com animações
+    displayBetResult(result);
+    
+    // Atualizar UI
+    updateUI();
+    
+    // Mostrar mensagem psicológica
+    if (result.message) {
+        showMessage(result.message, result.is_win ? "win" : "loss");
+    }
+    
+    // Verificar se jogo terminou
+    if (result.game_over) {
+        setTimeout(() => {
             showFinalDashboard();
-        }
-        
-        gameInProgress = false;
-    } catch (error) {
-        console.error('Erro ao fazer aposta:', error);
-        showMessage("Erro na aposta!", "error");
-        gameInProgress = false;
+        }, 2000);
+    }
+    
+    gameInProgress = false;
+}
+
+function attemptCashout() {
+    const result = gameInstance.attemptCashout(false);
+    
+    if (result.need_confirmation) {
+        // Mostrar modal de confirmação
+        document.getElementById('cashout-modal-message').textContent = result.message;
+        document.getElementById('cashout-modal').classList.remove('hidden');
+    } else if (result.success) {
+        displayCashoutResult(result);
     }
 }
 
-async function attemptCashout() {
-    try {
-        const response = await fetch(`${API_BASE}/game/cashout`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                session_id: sessionId,
-                confirmed: false
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.need_confirmation) {
-            // Mostrar modal de confirmação com mensagem psicológica
-            document.getElementById('cashout-modal-message').textContent = result.message;
-            document.getElementById('cashout-modal').classList.remove('hidden');
-        } else if (result.success) {
-            displayCashoutResult(result);
-        }
-    } catch (error) {
-        console.error('Erro ao tentar saque:', error);
-    }
-}
-
-async function confirmCashout() {
+function confirmCashout() {
     closeCashoutModal();
     
-    try {
-        const response = await fetch(`${API_BASE}/game/cashout`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                session_id: sessionId,
-                confirmed: true
-            })
-        });
-        
-        const result = await response.json();
-        displayCashoutResult(result);
-    } catch (error) {
-        console.error('Erro no saque:', error);
-    }
+    const result = gameInstance.attemptCashout(true);
+    displayCashoutResult(result);
 }
 
 // ========== EXIBIÇÃO DE RESULTADOS ==========
@@ -196,37 +146,29 @@ function displayCashoutResult(result) {
 
 // ========== ATUALIZAÇÕES DE UI ==========
 
-async function updateUI() {
-    try {
-        const response = await fetch(`${API_BASE}/game/state/${sessionId}`);
-        const state = await response.json();
-        currentGameState = state;
-        
-        // Atualizar saldo
-        document.getElementById('coins-display').textContent = state.coins;
-        document.getElementById('coins-needed').textContent = Math.max(0, 100 - state.coins);
-        
-        // Atualizar barra de progresso
-        const progress = Math.min(100, (state.coins / 100) * 100);
-        document.getElementById('progress-fill').style.width = progress + '%';
-        
-        // Atualizar estatísticas
-        document.getElementById('total-bets').textContent = state.total_bets;
-        
-        // Mostrar botão de cashout se atingiu 100 moedas
-        if (state.coins >= 100) {
-            document.getElementById('cashout-button').classList.remove('hidden');
-        } else {
-            document.getElementById('cashout-button').classList.add('hidden');
-        }
-        
-        // Desabilitar aposta se jogo terminou
-        if (state.game_state !== 'playing') {
-            document.getElementById('bet-button').classList.add('disabled');
-            document.getElementById('bet-button').disabled = true;
-        }
-    } catch (error) {
-        console.error('Erro ao atualizar UI:', error);
+function updateUI() {
+    // Atualizar saldo
+    document.getElementById('coins-display').textContent = gameInstance.coins;
+    document.getElementById('coins-needed').textContent = Math.max(0, 100 - gameInstance.coins);
+    
+    // Atualizar barra de progresso
+    const progress = Math.min(100, (gameInstance.coins / 100) * 100);
+    document.getElementById('progress-fill').style.width = progress + '%';
+    
+    // Atualizar estatísticas
+    document.getElementById('total-bets').textContent = gameInstance.totalBets;
+    
+    // Mostrar botão de cashout se atingiu 100 moedas
+    if (gameInstance.coins >= 100) {
+        document.getElementById('cashout-button').classList.remove('hidden');
+    } else {
+        document.getElementById('cashout-button').classList.add('hidden');
+    }
+    
+    // Desabilitar aposta se jogo terminou
+    if (gameInstance.gameState !== 'playing') {
+        document.getElementById('bet-button').classList.add('disabled');
+        document.getElementById('bet-button').disabled = true;
     }
 }
 
@@ -310,53 +252,47 @@ function updateBetAmount(value) {
 
 // ========== DASHBOARD FINAL CRÍTICO ==========
 
-async function showFinalDashboard() {
+function showFinalDashboard() {
     // Parar contador de tempo
     clearInterval(timeInterval);
     
-    try {
-        const statsResponse = await fetch(`${API_BASE}/game/stats/${sessionId}`);
-        const stats = await statsResponse.json();
-        
-        // Preencher dados do dashboard
-        document.getElementById('final-initial').textContent = stats.initial_coins;
-        document.getElementById('final-final').textContent = stats.final_coins;
-        document.getElementById('final-net').textContent = 
-            (stats.net_profit >= 0 ? '+' : '') + stats.net_profit;
-        
-        document.getElementById('final-bets').textContent = stats.total_bet;
-        document.getElementById('final-won').textContent = stats.total_won;
-        document.getElementById('final-lost').textContent = stats.total_lost;
-        document.getElementById('final-near-miss').textContent = stats.near_misses;
-        
-        document.getElementById('final-time').textContent = stats.time_playing_minutes + 'm';
-        document.getElementById('final-max').textContent = stats.max_coins_reached;
-        document.getElementById('final-loss-streak').textContent = stats.max_loss_streak;
-        document.getElementById('final-cashout-attempts').textContent = stats.attempted_cashouts;
-        
-        // Preencher análise
-        document.getElementById('analysis-near-miss-count').textContent = stats.near_misses;
-        document.getElementById('analysis-total-bets-text').textContent = stats.total_bet;
-        
-        // Preencher mensagens de impacto
-        populateRealityMessages(stats.total_lost);
-        
-        // Preencher mensagem final
-        document.getElementById('final-message-lost').textContent = stats.total_lost;
-        document.getElementById('final-message-time').textContent = stats.time_playing_minutes;
-        document.getElementById('final-message-bets').textContent = stats.total_bet;
-        document.getElementById('final-message-platform').textContent = stats.total_lost - stats.total_won;
-        
-        // Mostrar tela final
-        document.getElementById('main-container').classList.add('hidden');
-        document.getElementById('final-screen').classList.remove('hidden');
-        
-        // Scroll para topo
-        window.scrollTo(0, 0);
-        
-    } catch (error) {
-        console.error('Erro ao carregar dashboard final:', error);
-    }
+    const stats = gameInstance.getFinalStats();
+    
+    // Preencher dados do dashboard
+    document.getElementById('final-initial').textContent = stats.initial_coins;
+    document.getElementById('final-final').textContent = stats.final_coins;
+    document.getElementById('final-net').textContent = 
+        (stats.net_profit >= 0 ? '+' : '') + stats.net_profit;
+    
+    document.getElementById('final-bets').textContent = stats.total_bet;
+    document.getElementById('final-won').textContent = stats.total_won;
+    document.getElementById('final-lost').textContent = stats.total_lost;
+    document.getElementById('final-near-miss').textContent = stats.near_misses;
+    
+    document.getElementById('final-time').textContent = stats.time_playing_minutes + 'm';
+    document.getElementById('final-max').textContent = stats.max_coins_reached;
+    document.getElementById('final-loss-streak').textContent = stats.max_loss_streak;
+    document.getElementById('final-cashout-attempts').textContent = stats.attempted_cashouts;
+    
+    // Preencher análise
+    document.getElementById('analysis-near-miss-count').textContent = stats.near_misses;
+    document.getElementById('analysis-total-bets-text').textContent = stats.total_bet;
+    
+    // Preencher mensagens de impacto
+    populateRealityMessages(stats.total_lost);
+    
+    // Preencher mensagem final
+    document.getElementById('final-message-lost').textContent = stats.total_lost;
+    document.getElementById('final-message-time').textContent = stats.time_playing_minutes;
+    document.getElementById('final-message-bets').textContent = stats.total_bet;
+    document.getElementById('final-message-platform').textContent = stats.total_lost - stats.total_won;
+    
+    // Mostrar tela final
+    document.getElementById('main-container').classList.add('hidden');
+    document.getElementById('final-screen').classList.remove('hidden');
+    
+    // Scroll para topo
+    window.scrollTo(0, 0);
 }
 
 function populateRealityMessages(amountLost) {
@@ -382,13 +318,7 @@ function populateRealityMessages(amountLost) {
 
 // ========== RESET DO JOGO ==========
 
-async function resetGame() {
-    try {
-        await fetch(`${API_BASE}/game/reset/${sessionId}`, { method: 'POST' });
-    } catch (error) {
-        console.error('Erro ao resetar:', error);
-    }
-    
+function resetGame() {
     // Recarregar página
     location.reload();
 }
@@ -398,22 +328,4 @@ async function resetGame() {
 window.addEventListener('error', (event) => {
     console.error('Erro global:', event.error);
     showMessage("Erro na aplicação!", "error");
-});
-
-// Verificar conexão com servidor
-window.addEventListener('load', async () => {
-    try {
-        const response = await fetch(`${API_BASE}/game/start`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: 'test' })
-        }).catch(() => null);
-        
-        if (!response) {
-            console.warn('Servidor não está disponível!');
-            showMessage("⚠️ Servidor não está rodando. Inicie com: python backend/app.py", "error");
-        }
-    } catch (error) {
-        console.warn('Erro ao verificar servidor:', error);
-    }
 });

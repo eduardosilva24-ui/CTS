@@ -19,17 +19,40 @@ Demonstrar, de forma educacional e crítica, os mecanismos reais de:
 
 ---
 
+## 🚀 VERSÃO GITHUB PAGES (NOVO!)
+
+**Este projeto agora funciona 100% em GitHub Pages!**
+
+✨ **Sem necessidade de servidor Python!**
+
+Acesse online: **[Seu Link Pages Aqui]**
+
+Para colocar seu próprio projeto no Pages:
+👉 Leia: [GUIA_GITHUB_PAGES.txt](GUIA_GITHUB_PAGES.txt) (5 minutos!)
+
+---
+
 ## ⚙️ Tecnologias
 
-- **Backend**: Python com Flask
-- **Frontend**: HTML5, CSS3 e JavaScript Vanilla
+- **Frontend**: HTML5, CSS3 e JavaScript Vanilla ✨ (Agora 100% standalone!)
+- **Lógica**: JavaScript puro (sem backend necessário)
 - **Design**: Tema escuro e neon (aparência viciante proposital)
 - **Responsividade**: Mobile e desktop
+- **Deploy**: GitHub Pages (grátis, automático)
 
 ---
 
 ## 📋 Pré-requisitos
 
+### Opção 1: GitHub Pages (Recomendado) ⭐
+- ✅ Apenas um navegador moderno
+- ✅ Sem instalação necessária
+- ✅ Funciona online e offline
+- ✅ 100% grátis
+
+Leia: [GUIA_GITHUB_PAGES.txt](GUIA_GITHUB_PAGES.txt)
+
+### Opção 2: Rodar Localmente
 - **Python 3.8+** instalado
 - **pip** (gerenciador de pacotes Python)
 - Navegador moderno (Chrome, Firefox, Edge)
@@ -39,7 +62,19 @@ Demonstrar, de forma educacional e crítica, os mecanismos reais de:
 
 ## 🚀 Como Executar
 
-### 1. Instalação das Dependências Python
+### ⭐ OPÇÃO 1: GitHub Pages (Recomendado)
+
+Siga o guia rápido: [GUIA_GITHUB_PAGES.txt](GUIA_GITHUB_PAGES.txt)
+
+Em 5 minutos seu projeto estará online e você terá um link para compartilhar!
+
+```
+https://seu-usuario.github.io/cts-apostas-critica/
+```
+
+### Opção 2: Localmente (Python + Flask)
+
+#### 1. Instalação das Dependências Python
 
 Abra o terminal na pasta do projeto e execute:
 
@@ -48,32 +83,29 @@ cd backend
 pip install -r requirements.txt
 ```
 
-### 2. Iniciar o Servidor Backend
+#### 2. Iniciar o Frontend
 
+**Opção A: Servidor Local (Recomendado)**
 ```bash
-python app.py
-```
-
-Você verá:
-```
- * Running on http://0.0.0.0:5000
- * Press CTRL+C to quit
-```
-
-### 3. Abrir o Frontend
-
-Abra o arquivo `frontend/index.html` no navegador:
-- Pode fazer duplo-clique no arquivo
-- Ou arrastar para o navegador
-- Ou usar um servidor local (recomendado):
-
-```bash
-# Em outro terminal
 cd frontend
 python -m http.server 8000
 ```
-
 Depois acesse: `http://localhost:8000`
+
+**Opção B: Duplo-clique no arquivo**
+- Simplesmente duplo-clique em `frontend/index.html`
+- Abre no navegador padrão
+- Funciona 100% (sem servidor necessário)
+
+#### 3. Backend Python (Opcional)
+
+Se quiser rodar o backend (não é necessário):
+```bash
+cd backend
+python app.py
+```
+
+⚠️ **A lógica está em JavaScript agora!** O backend é completamente opcional.
 
 ---
 
@@ -294,5 +326,6 @@ Plataformas reais de apostas online têm responsabilidades legais e éticas que 
 **Propósito: Demonstração crítica de manipulação psicológica em tecnologia**  
 **Data: 2026**
 
-#   C T S  
+#   C T S 
+ 
  
